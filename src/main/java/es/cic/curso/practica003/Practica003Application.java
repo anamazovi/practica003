@@ -10,4 +10,17 @@ public class Practica003Application {
 		SpringApplication.run(Practica003Application.class, args);
 	}
 
+	// @Bean
+	// public CommandLineRunner commandLineRunner(ExpedienteRepository expedienteRepository) {
+	// 	return args -> {
+
+	// 		Expediente expediente = new Expediente(); 
+	// 		expediente.setNombre("Juan");
+
+	// 		expedienteRepository.save(expediente);
+
+	// 	};
+	// }
+
+
 }

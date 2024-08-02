@@ -1,6 +1,7 @@
 package es.cic.curso.practica003.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.cic.curso.practica003.model.Documento;
+import es.cic.curso.practica003.model.Expediente;
 import es.cic.curso.practica003.service.DocumentoService;
 
 @RestController
@@ -23,31 +25,36 @@ public class DocumentoController {
     @Autowired
     private DocumentoService documentoService;
 
-    @GetMapping
+    //Devuelve una lista de todos los documentos
+    @GetMapping ("/documentos")
     public List<Documento> getAllDocumentos() {
-        return documentoService.getAllDocumentos();
+        return documentoService.listar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Documento> getDocumentoById(@PathVariable Long id) {
-        Documento documento = documentoService.getDocumentoById(id);
-        return ResponseEntity.ok(documento);
+    public Documento leer(@PathVariable("id") long id)  {
+        return documentoService.leer(id);
     }
 
-    @PostMapping
-    public Documento createDocumento(@RequestBody Documento documento) {
-        return documentoService.createDocumento(documento);
+
+
+    //Crea un nuevo documento que es Documento documento y lo devuelve
+    @PostMapping ("/api/documentos")
+    public Documento crearDocumento(@RequestBody Documento documento) {
+        return documentoService.crearDocumento(documento);
     }
 
+    /* 
     @PutMapping("/{id}")
-    public ResponseEntity<Documento> updateDocumento(@PathVariable Long id, @RequestBody Documento documentoDetails) {
-        Documento updatedDocumento = documentoService.updateDocumento(id, documentoDetails);
-        return ResponseEntity.ok(updatedDocumento);
-    }
+    public ResponseEntity<Documento> actualizar(@PathVariable Long id, @RequestBody Documento documentoDetails) {
+        Optional<Documento> optionalDocumento = documentoService.actualizar(id, documentoDetails);
+        return optionalDocumento.map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build());
+    }*/
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocumento(@PathVariable Long id) {
-        documentoService.deleteDocumento(id);
+    public ResponseEntity<Void> borrarDocumento(@PathVariable Long id) {
+        documentoService.borrarDocumento(id);
         return ResponseEntity.noContent().build();
     }
 }
