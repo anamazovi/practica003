@@ -6,9 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.cic.curso.practica003.exception.DocumentoExpedienteException;
-import es.cic.curso.practica003.model.Documento;
-import es.cic.curso.practica003.repository.DocumentoRepository;
+import es.cic.curso.practica003.model.Expediente;
+import es.cic.curso.practica003.repository.ExpedienteRepository;
 
 
 
@@ -18,14 +17,14 @@ import es.cic.curso.practica003.repository.DocumentoRepository;
  */
 @Service
 @Transactional
-public class DocumentoService {
+public class ExpedienteService {
 
     /*
      * @Autowired: Inyecta una instancia del repositorio 
      * DocumentoRepository en el servicio.
      */
     @Autowired
-    private DocumentoRepository documentoRepository;
+    private ExpedienteRepository expedienteRepository;
 
     /*
      * Métodos del servicio:
@@ -35,31 +34,27 @@ public class DocumentoService {
      * deleteById(Long id): Elimina una entidad por su ID.
      */
 
-   // Crear Documento 
-   public Documento crearDocumento(Documento documento) {
-        return documentoRepository.save(documento);
+    // Obtener todos los Documentos
+    @Transactional
+    public List<Expediente> findAll() {
+        return expedienteRepository.findAll();
     }
 
     // Leer Documento por ID: buscamos documento en la bbdd por el id que es Long id y devuellve un Optiona<Documento> que lo contiene si lo encuentra
     @Transactional (readOnly = true)
-    public Documento leer (Long id) {
-        return documentoRepository.findById(id).orElseThrow(() -> new DocumentoExpedienteException (String.format("No lo encontré el %d chaval@", id)));
+    public Expediente findById(Long id) {
+        return expedienteRepository.findById(id).orElse(null);
     }
 
-    // Actualizar Documento
-    public void Actualizar(Documento documento) {
-        documentoRepository.save(documento);
-        
+    // Actualizar o crear Documento
+    public Expediente save(Expediente expediente) {
+        return expedienteRepository.save(expediente);
     }
 
     // Borrar Documento
-    public void borrarDocumento(Long id) {
-        documentoRepository.deleteById(id);
+    public void deleteById(Long id) {
+        expedienteRepository.deleteById(id);
     }
 
-    // Obtener todos los Documentos
-    @Transactional
-    public List<Documento> listar() {
-        return documentoRepository.findAll();
-    }
+  
 }

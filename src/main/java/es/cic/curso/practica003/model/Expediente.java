@@ -2,14 +2,14 @@ package es.cic.curso.practica003.model;
 
 import java.util.List;
 
-import org.hibernate.engine.jdbc.Size;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Size;
+
 
 @Entity
 public class Expediente {
