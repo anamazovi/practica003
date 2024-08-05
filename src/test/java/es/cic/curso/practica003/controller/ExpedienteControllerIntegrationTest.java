@@ -2,11 +2,7 @@ package es.cic.curso.practica003.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,23 +23,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.cic.curso.practica003.model.Expediente;
 import es.cic.curso.practica003.repository.ExpedienteRepository;
-import es.cic.curso.practica003.service.ExpedienteService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+
+
 
 
 @SpringBootTest
+@AutoConfigureMockMvc
 public class ExpedienteControllerIntegrationTest {
 
 
     @Autowired
     private ExpedienteRepository expedienteRepository;
-
-	@PersistenceContext
-	private EntityManager em;
-    
-	@Autowired
-	private ExpedienteService expedienteService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -85,10 +76,8 @@ public class ExpedienteControllerIntegrationTest {
     public void testGetExpedienteById_NotFound() throws Exception {
         Long id = 999L; // Un ID que sabemos que no existe
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/expedientes/{id}", id))
-                .andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus());
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/expedientes/{id}", id))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -96,9 +85,9 @@ public class ExpedienteControllerIntegrationTest {
         Long id = expediente1.getId();
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/expedientes/{id}", id))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         Expediente foundExpediente = objectMapper.readValue(result.getResponse().getContentAsString(), Expediente.class);
         assertNotNull(foundExpediente);
         assertEquals("Expediente 1", foundExpediente.getNombre());
@@ -110,11 +99,11 @@ public class ExpedienteControllerIntegrationTest {
         newExpediente.setNombre("Expediente 3");
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/expedientes")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(newExpediente)))
-                .andReturn();
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(newExpediente)))
+            .andExpect(status().isOk())
+            .andReturn();
 
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         Expediente createdExpediente = objectMapper.readValue(result.getResponse().getContentAsString(), Expediente.class);
         assertNotNull(createdExpediente);
         assertEquals("Expediente 3", createdExpediente.getNombre());
@@ -126,15 +115,13 @@ public class ExpedienteControllerIntegrationTest {
         Expediente expedienteDetails = new Expediente();
         expedienteDetails.setNombre("Updated Expediente");
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/expedientes/{id}", id)
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/expedientes/{id}", id)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(expedienteDetails)))
-                .andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus());
+                .andExpect(status().isNotFound());
     }
 
-    @Test
+
     public void testUpdateExpediente_Found() throws Exception {
         Long id = expediente1.getId();
 
@@ -144,9 +131,8 @@ public class ExpedienteControllerIntegrationTest {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/expedientes/{id}", id)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(expedienteDetails)))
+                .andExpect(status().isOk())
                 .andReturn();
-
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
 
         Expediente updatedExpediente = objectMapper.readValue(result.getResponse().getContentAsString(), Expediente.class);
         assertNotNull(updatedExpediente);
@@ -157,19 +143,15 @@ public class ExpedienteControllerIntegrationTest {
     public void testDeleteExpediente_NotFound() throws Exception {
         Long id = 999L; // Un ID que sabemos que no existe
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.delete("/api/expedientes/{id}", id))
-                .andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/expedientes/{id}", id))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void testDeleteExpediente_Found() throws Exception {
         Long id = expediente1.getId();
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.delete("/api/expedientes/{id}", id))
-                .andReturn();
-
-        assertEquals(HttpStatus.NO_CONTENT.value(), result.getResponse().getStatus());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/expedientes/{id}", id))
+                .andExpect(status().isNoContent());
     }
 }
